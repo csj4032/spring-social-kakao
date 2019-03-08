@@ -24,8 +24,8 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class KakaoTemplateTest {
-	static final String ACCESS_TOKEN = "access token"; //insert access token
-	static final String ADMIN_KEY = "admin key"; //insert admin key
+	static final String ACCESS_TOKEN = ""; //insert access token
+	static final String ADMIN_KEY = ""; //insert admin key
 	static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 	Kakao kakao;
@@ -95,6 +95,7 @@ public class KakaoTemplateTest {
 	}
 
 	@Test
+	@Ignore
 	public void getTalkProfile() {
 		//kakao talk
 		System.out.println("********************************************************");
@@ -110,6 +111,7 @@ public class KakaoTemplateTest {
 	}
 
 	@Test
+	@Ignore
 	public void sendToMe() {
 		System.out.println("********************************************************");
 		System.out.println("** Talk operation");
@@ -397,9 +399,24 @@ public class KakaoTemplateTest {
 		param.set("fromId", "");
 		param.set("order", "");
 
-
 		KakaoIds kakaoIds = restTemplate.postForObject(URIBuilder.fromUri("https://kapi.kakao.com/v1/user/ids").queryParams(param).build(), new HttpEntity<Object>(headers), KakaoIds.class);
 
 		System.out.println(kakaoIds.toJsonString(true));
+	}
+
+	@Test
+	public void translationTest() {
+		//kakao translation
+		System.out.println("********************************************************");
+		System.out.println("** Translation operation");
+		System.out.println("********************************************************");
+
+		TranslateObject translateObject = new TranslateObject();
+		translateObject.setSrcLang(LanguageType.EN);
+		translateObject.setTargetLang(LanguageType.KR);
+		translateObject.setQuery("KakaoTalk orders, which opened in March last year, have secured about 2.");
+		TranslatedText translatedText = kakao.translationOperation().translate(translateObject);
+		System.out.println(String.format("** translation : %s", translatedText.getTranslatedText()));
+		System.out.println("********************************************************");
 	}
 }

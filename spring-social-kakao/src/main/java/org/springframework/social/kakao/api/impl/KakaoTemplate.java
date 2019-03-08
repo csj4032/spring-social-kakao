@@ -8,11 +8,7 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.social.kakao.api.Kakao;
-import org.springframework.social.kakao.api.PushOperation;
-import org.springframework.social.kakao.api.StoryOperation;
-import org.springframework.social.kakao.api.TalkOperation;
-import org.springframework.social.kakao.api.UserOperation;
+import org.springframework.social.kakao.api.*;
 import org.springframework.social.oauth2.AbstractOAuth2ApiBinding;
 import org.springframework.social.support.ClientHttpRequestFactorySelector;
 import org.springframework.social.support.HttpRequestDecorator;
@@ -23,6 +19,7 @@ public class KakaoTemplate extends AbstractOAuth2ApiBinding implements Kakao {
 	private StoryOperation storyOperation;
 	private TalkOperation talkOperation;
 	private PushOperation pushOperation;
+	private TranslationOperation translationOperation;
 
 	private String adminKey;
 	private RestTemplate adminRestTemplate;
@@ -31,7 +28,6 @@ public class KakaoTemplate extends AbstractOAuth2ApiBinding implements Kakao {
 		initialize();
 	}
 
-	@Deprecated
 	public KakaoTemplate(String accessToken) {
 		super(accessToken);
 		initialize();
@@ -64,13 +60,17 @@ public class KakaoTemplate extends AbstractOAuth2ApiBinding implements Kakao {
 		return pushOperation;
 	}
 
+	public TranslationOperation translationOperation() {
+		return translationOperation;
+	}
+
 	private void initialize() {
 		super.setRequestFactory(ClientHttpRequestFactorySelector.bufferRequests(getRestTemplate().getRequestFactory()));
-		
+
 		//create admin rest template
 		adminRestTemplate = new RestTemplate(ClientHttpRequestFactorySelector.getRequestFactory());
 		adminRestTemplate.setInterceptors(Arrays.asList(new ClientHttpRequestInterceptor[]{new AdminKeyHeaderOAuth2RequestInterceptor(adminKey)}));
-		
+
 		initSubApis();
 	}
 
@@ -79,6 +79,7 @@ public class KakaoTemplate extends AbstractOAuth2ApiBinding implements Kakao {
 		storyOperation = new StoryTemplate(getRestTemplate(), isAuthorized());
 		talkOperation = new TalkTemplate(getRestTemplate(), isAuthorized());
 		pushOperation = new PushTemplate(adminRestTemplate, isAuthorized());
+		translationOperation = new TranslationTemplate(adminRestTemplate, isAuthorized());
 	}
 
 	/**
@@ -86,11 +87,11 @@ public class KakaoTemplate extends AbstractOAuth2ApiBinding implements Kakao {
 	 */
 	class AdminKeyHeaderOAuth2RequestInterceptor implements ClientHttpRequestInterceptor {
 		private final String adminKey;
-		
+
 		public AdminKeyHeaderOAuth2RequestInterceptor(String adminKey) {
 			this.adminKey = adminKey;
 		}
-		
+
 		public ClientHttpResponse intercept(final HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 			HttpRequest protectedResourceRequest = new HttpRequestDecorator(request);
 			protectedResourceRequest.getHeaders().set("Authorization", "KakaoAK " + adminKey);

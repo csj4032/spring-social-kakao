@@ -39,7 +39,6 @@ public class AbstractKakaoOperations {
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		headers.setAccept(Arrays.asList(new MediaType[]{MediaType.ALL}));
 		headers.set("Authorization", "KakaoAK " + adminKey); //admin key를 header에 셋팅해야함
-		
 		return headers;
 	}
 }
