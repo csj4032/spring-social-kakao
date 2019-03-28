@@ -416,7 +416,7 @@ public class KakaoTemplateTest {
 		translateObject.setTargetLang(LanguageType.KR);
 		translateObject.setQuery("KakaoTalk orders, which opened in March last year, have secured about 2.");
 		TranslatedText translatedText = kakao.translationOperation().translate(translateObject);
-		System.out.println(String.format("** translation : %s", translatedText.getTranslatedText()));
+		System.out.println(translatedText.getTranslatedText());
 		System.out.println("********************************************************");
 	}
 }
